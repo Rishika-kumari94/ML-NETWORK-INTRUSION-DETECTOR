@@ -1,0 +1,104 @@
+# ML Network Intrusion Detector
+
+**IBM SkillsBuild Cyber Security BootCamp 2026 (BharatCares) - Final Project**
+
+**Author:** RISHIKA KUMARI | **Email:** rishika321kumari@gmail.com
+
+## Overview
+
+A machine learning based Network Intrusion Detection System (IDS) that classifies network connections as **normal** or **attack** using Scikit-learn. Three models (Logistic Regression, Decision Tree and Random Forest) are trained on the NSL-KDD dataset, compared using security-relevant metrics, and the best one is saved for reuse.
+
+## Dataset
+
+- **Name:** NSL-KDD (improved version of KDD Cup 1999)
+- **Source:** https://www.unb.ca/cic/datasets/nsl.html
+- **Mirror used for automatic download:** https://github.com/defcom17/NSL_KDD
+- **Files used:** `KDDTrain+.txt` (about 125,973 records) and `KDDTest+.txt` (about 22,544 records)
+- **Features:** 41 connection features (protocol, service, flag, bytes, login and traffic-rate statistics)
+- **Target:** binary, `0` = normal, `1` = attack (DoS, Probe, R2L, U2R)
+
+## Project Description
+
+1. Load the training and test data
+2. Explore class balance, attack types and protocol/flag distributions
+3. Preprocess: binary target, one-hot encoding of `protocol_type`, `service`, `flag`, column alignment, standard scaling
+4. Train Logistic Regression, Decision Tree and Random Forest
+5. Evaluate with accuracy, precision, recall, F1-score, confusion matrices, classification report and ROC/AUC
+6. Plot the top 15 feature importances from the Random Forest
+7. Save the best model, scaler and column list with joblib and predict on sample connections
+
+## Technologies Used
+
+- Python 3.9+
+- Jupyter Notebook / Google Colab
+- NumPy, pandas
+- Matplotlib, seaborn
+- scikit-learn
+- joblib
+
+## Project Structure
+
+```
+.
+├── YourName_ML_Network_Intrusion_Detector.ipynb   # main notebook
+├── requirements.txt                               # dependencies
+├── YourName_ProjectReport.docx                    # project report
+├── README.md
+├── data/                                          # created on first run (NSL-KDD files)
+└── model/                                         # created on first run (saved model)
+```
+
+## Setup and Run Instructions
+
+1. **Clone or download** this project and open a terminal in its folder.
+
+2. **Create a virtual environment:**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate        # Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Start Jupyter:**
+   ```bash
+   jupyter notebook
+   ```
+
+5. **Open** `YourName_ML_Network_Intrusion_Detector.ipynb` and choose **Kernel > Restart and Run All**.
+
+The dataset downloads automatically on the first run. If you are offline, download `KDDTrain+.txt` and `KDDTest+.txt` from the dataset link above and place them in a `data/` folder next to the notebook.
+
+**Google Colab:** upload the notebook, then run all cells. The libraries are already installed.
+
+## Key Information
+
+- **Models compared:** Logistic Regression (baseline), Decision Tree (max depth 15), Random Forest (100 trees)
+- **Best model:** selected automatically by highest F1-score on the test set
+- **Output:** `model/intrusion_detector.joblib` containing the model, scaler and feature columns
+- **Expected performance:** tree-based models typically outperform the linear baseline; test accuracy is lower than training accuracy because the NSL-KDD test set includes attack types not seen in training
+- **Random seed:** 42, for reproducible results
+
+## Loading the Saved Model
+
+```python
+import joblib
+bundle = joblib.load("model/intrusion_detector.joblib")
+model, scaler, columns = bundle["model"], bundle["scaler"], bundle["columns"]
+# new_data must be preprocessed the same way (one-hot encoded, columns aligned)
+predictions = model.predict(scaler.transform(new_data[columns]))   # 0 = normal, 1 = attack
+```
+
+## Limitations and Future Work
+
+- NSL-KDD reflects older traffic patterns and does not cover modern or encrypted attacks
+- Works on pre-extracted features, not live packet capture
+- Possible extensions: multi-class attack-type detection, hyperparameter tuning, class-imbalance handling, newer datasets (CICIDS2017, UNSW-NB15), deep learning and real-time deployment
+
+## References
+
+- Tavallaee et al., "A Detailed Analysis of the KDD CUP 99 Data Set," IEEE CISDA, 2009
+- Pedregosa et al., "Scikit-learn: Machine Learning in Python," JMLR, 2011
